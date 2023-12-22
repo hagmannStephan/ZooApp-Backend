@@ -15,8 +15,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
 
-        // Instead of "*" for allowedOrigins, list your specific origins
-        config.addAllowedOrigin("http://localhost:3000");  // Replace with your React app's origin
+        config.addAllowedOrigin("http://localhost:3000");
 
         config.addAllowedHeader("*");
         config.addAllowedMethod("OPTIONS");
@@ -25,7 +24,7 @@ public class CorsConfig {
         config.addAllowedMethod("PUT");
         config.addAllowedMethod("DELETE");
 
-        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/tickets/**", config);
         return new CorsFilter(source);
     }
 }
