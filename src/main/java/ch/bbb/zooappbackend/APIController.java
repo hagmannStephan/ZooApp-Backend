@@ -3,7 +3,7 @@ package ch.bbb.zooappbackend;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.*;
 
 
 @RestController
@@ -79,5 +79,27 @@ public class APIController {
             }
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/parking")
+    public ResponseEntity<int[]> getParking() {
+        Random random = new Random();
+        Set<Integer> uniqueNumbers = new HashSet<>();
+
+        int numberOfEntries = random.nextInt(41) + 10;
+        int[] randomArray = new int[numberOfEntries];
+
+        for (int i = 0; i < randomArray.length; i++) {
+            int randomNumber;
+            do {
+                randomNumber = random.nextInt(150) + 1;
+            } while (!uniqueNumbers.add(randomNumber));
+
+            randomArray[i] = randomNumber;
+        }
+
+        Arrays.sort(randomArray);
+
+        return ResponseEntity.ok(randomArray);
     }
 }
