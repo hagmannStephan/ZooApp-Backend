@@ -18,20 +18,14 @@ public class APIController {
 
     @GetMapping("/tickets/{id}")
     public ResponseEntity<Ticket> getTicketById(@PathVariable int id) {
-        for (Ticket ticket : tickets) {
-            int currentId = ticket.getId();
-            if (currentId == id) {
-                return ResponseEntity.ok(ticket);
-            }
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(DBConnector.getTicketById(id));
     }
 
     @PostMapping("/tickets")
     public ResponseEntity<Ticket> postTickets(@RequestBody Ticket ticket) {
         ticket.setPrice(ticket.calculatePrice());
-        ticket.calculateId(tickets);
-        tickets.add(ticket);
+        ticket.calculateId(DBConnector.getTickets());
+        DBConnector.addTicket(ticket);
         return ResponseEntity.status(201).body(ticket);
     }
 
