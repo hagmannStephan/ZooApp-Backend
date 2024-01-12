@@ -35,6 +35,12 @@ public class Ticket {
         this.numChildren = numChildren;
     }
 
+    public Ticket() {
+        this.date = "";
+        this.numAdults = 0;
+        this.numChildren = 0;
+    }
+
     public int getId() {
         return id;
     }

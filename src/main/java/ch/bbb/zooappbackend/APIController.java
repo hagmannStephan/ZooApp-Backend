@@ -13,7 +13,7 @@ public class APIController {
 
     @GetMapping("/tickets")
     public ResponseEntity<ArrayList<Ticket>> getTickets() {
-        return ResponseEntity.ok(tickets);
+        return ResponseEntity.ok(DBConnector.getTickets());
     }
 
     @GetMapping("/tickets/{id}")
