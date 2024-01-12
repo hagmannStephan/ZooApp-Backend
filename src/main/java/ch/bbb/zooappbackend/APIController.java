@@ -76,24 +76,25 @@ public class APIController {
     }
 
     @GetMapping("/parking")
-    public ResponseEntity<int[]> getParking() {
+    public ResponseEntity<List<ParkingSpace>> getParking() {
         Random random = new Random();
         Set<Integer> uniqueNumbers = new HashSet<>();
+        List<ParkingSpace> parkingSpaces = new ArrayList<>();
 
         int numberOfEntries = random.nextInt(41) + 10;
-        int[] randomArray = new int[numberOfEntries];
 
-        for (int i = 0; i < randomArray.length; i++) {
+        for (int i = 0; i < numberOfEntries; i++) {
             int randomNumber;
             do {
                 randomNumber = random.nextInt(150) + 1;
             } while (!uniqueNumbers.add(randomNumber));
 
-            randomArray[i] = randomNumber;
+            ParkingSpace parkingSpace = new ParkingSpace(randomNumber);
+            parkingSpaces.add(parkingSpace);
         }
 
-        Arrays.sort(randomArray);
+        parkingSpaces.sort(Comparator.comparingInt(ParkingSpace::getId));
 
-        return ResponseEntity.ok(randomArray);
+        return ResponseEntity.ok(parkingSpaces);
     }
 }
