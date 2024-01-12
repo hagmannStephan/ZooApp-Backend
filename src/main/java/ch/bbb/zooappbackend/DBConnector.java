@@ -4,7 +4,11 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoException;
 import com.mongodb.client.*;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.util.*;
 
@@ -92,6 +96,93 @@ public class DBConnector {
                 System.out.println("Ticket added successfully!");
             } catch (MongoException me) {
                 System.err.println("An error occurred while attempting to run a command: " + me);
+            }
+        }
+    }
+
+    public static void updateTicket(Ticket updatedTicket) {
+        try (MongoClient mongoClient = MongoClients.create(
+                MongoClientSettings.builder().applyConnectionString(new ConnectionString(CONNECTION_STRING)).build()
+        )) {
+            MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
+            try {
+                MongoCollection<Document> ticketDocs = database.getCollection(COLLECTION_NAME);
+
+                // Create a query to find the document with the specified id
+                Document query = new Document("id", updatedTicket.getId());
+
+                // Create an update with the new values
+                Document updateDoc = new Document();
+                updateDoc.append("$set", new Document()
+                        .append("date", updatedTicket.getDate())
+                        .append("numAdults", updatedTicket.getNumAdults())
+                        .append("numChildren", updatedTicket.getNumChildren())
+                        .append("price", updatedTicket.getPrice()));
+
+                // Perform the update
+                ticketDocs.updateOne(query, updateDoc, new UpdateOptions().upsert(true));
+
+                System.out.println("Ticket updated successfully!");
+            } catch (MongoException me) {
+                System.err.println("An error occurred while attempting to run a command: " + me);
+            }
+        }
+    }
+
+    public static void updateTicketFields(Ticket updatedTicket) {
+        try (MongoClient mongoClient = MongoClients.create(
+                MongoClientSettings.builder().applyConnectionString(new ConnectionString(CONNECTION_STRING)).build()
+        )) {
+            MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
+            try {
+                MongoCollection<Document> ticketDocs = database.getCollection(COLLECTION_NAME);
+
+                // Create a query to find the document with the specified id
+                Document query = new Document("id", updatedTicket.getId());
+
+                // Create an update with the new values
+                Document updateDoc = new Document();
+                if (updatedTicket.getDate() != null) {
+                    updateDoc.append("$set", new Document("date", updatedTicket.getDate()));
+                }
+                if (updatedTicket.getNumAdults() != 0) {
+                    updateDoc.append("$set", new Document("numAdults", updatedTicket.getNumAdults()));
+                }
+                if (updatedTicket.getNumChildren() != 0) {
+                    updateDoc.append("$set", new Document("numChildren", updatedTicket.getNumChildren()));
+                }
+
+                updateDoc.append("$set", new Document("price", updatedTicket.getPrice()));
+
+                // Perform the update
+                ticketDocs.updateOne(query, updateDoc, new UpdateOptions().upsert(true));
+
+                System.out.println("Ticket fields updated successfully!");
+            } catch (MongoException me) {
+                System.err.println("An error occurred while attempting to run a command: " + me);
+            }
+        }
+    }
+
+    public static boolean deleteTicket(int ticketId) {
+        try (MongoClient mongoClient = MongoClients.create(
+                MongoClientSettings.builder().applyConnectionString(new ConnectionString(CONNECTION_STRING)).build()
+        )) {
+            MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
+            try {
+                MongoCollection<Document> ticketDocs = database.getCollection(COLLECTION_NAME);
+
+                // Create a filter to find the document with the specified id
+                Bson filter = Filters.eq("id", ticketId);
+
+                // Perform the deletion
+                DeleteResult deleteResult = ticketDocs.deleteOne(filter);
+
+                // Check if a document was deleted
+                return deleteResult.getDeletedCount() > 0;
+            } catch (MongoException me) {
+                System.err.println("An error occurred while attempting to run a command: " + me);
+                return false;
             }
         }
     }

@@ -30,49 +30,58 @@ public class APIController {
     }
 
     @PutMapping("/tickets/{id}")
-    public ResponseEntity<Ticket> putTickets(@PathVariable int id, @RequestBody Ticket newTicket){
-        for (Ticket ticket : tickets) {
-            int currentId = ticket.getId();
-            if (currentId == id) {
-                newTicket.setId(id);        // User can't update these values
-                newTicket.setPrice(ticket.getPrice());
-                ticket = newTicket;
-                return ResponseEntity.ok(ticket);
-            }
+    public ResponseEntity<Ticket> putTickets(@PathVariable int id, @RequestBody Ticket newTicket) {
+        Ticket existingTicket = DBConnector.getTicketById(id);
+
+        if (existingTicket != null) {
+            // User can't update these values
+            newTicket.setId(id);
+            newTicket.setPrice(newTicket.calculatePrice());
+
+            DBConnector.updateTicket(newTicket);
+
+            return ResponseEntity.ok(newTicket);
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/tickets/{id}")
     public ResponseEntity<Ticket> patchTicket(@PathVariable int id, @RequestBody Ticket updatedFields) {
-        for (Ticket ticket : tickets) {
-            int currentId = ticket.getId();
-            if (currentId == id) {
-                if (updatedFields.getDate() != null) {
-                    ticket.setDate(updatedFields.getDate());
-                }
-                if (updatedFields.getNumAdults() != 0) {
-                    ticket.setNumAdults(updatedFields.getNumAdults());
-                }
-                if(updatedFields.getNumChildren() != 0){
-                    ticket.setNumChildren(updatedFields.getNumChildren());
-                }
-                return ResponseEntity.ok(ticket);
+        Ticket existingTicket = DBConnector.getTicketById(id);
+
+        if (existingTicket != null) {
+            // Update fields only if they are not null or 0
+            if (updatedFields.getDate() != null) {
+                existingTicket.setDate(updatedFields.getDate());
             }
+            if (updatedFields.getNumAdults() != 0) {
+                existingTicket.setNumAdults(updatedFields.getNumAdults());
+            }
+            if (updatedFields.getNumChildren() != 0) {
+                existingTicket.setNumChildren(updatedFields.getNumChildren());
+            }
+
+            existingTicket.calculatePrice();
+
+            // Update the ticket in the database
+            DBConnector.updateTicketFields(existingTicket);
+
+            return ResponseEntity.ok(existingTicket);
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/tickets/{id}")
     public ResponseEntity<Ticket> deleteTickets(@PathVariable int id) {
-        for (Ticket ticket : tickets) {
-            int currentId = ticket.getId();
-            if (currentId == id) {
-                tickets.remove(ticket);
-                return ResponseEntity.ok(ticket);
-            }
+        boolean deleted = DBConnector.deleteTicket(id);
+
+        if (deleted) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/parking")
