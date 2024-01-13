@@ -8,6 +8,21 @@ public class Ticket extends ResponseEntity{
     private int numChildren;
     private double price = 0;
 
+    public int calculateId(ArrayList<Ticket> tickets){
+        int id = Integer.MIN_VALUE;
+        int highestId = 0;
+
+        for (Ticket ticket : tickets) {
+            int currentId = ticket.getId();
+            if (currentId > highestId) {
+                highestId = currentId;
+            }
+        }
+
+        this.id = highestId + 1;
+        return id;
+    }
+
     public double calculatePrice() {
         this.price = (numAdults * 15) + (numChildren * 7.5);
         return this.price;

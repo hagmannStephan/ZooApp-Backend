@@ -18,7 +18,11 @@ public class APIController {
 
     @GetMapping("/tickets/{id}")
     public ResponseEntity<Ticket> getTicketById(@PathVariable int id) {
-        return ResponseEntity.ok(DBConnector.getTicketById(id));
+        Ticket t = DBConnector.getTicketById(id);
+        if (t != null) {
+            return ResponseEntity.ok(t);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/tickets")
