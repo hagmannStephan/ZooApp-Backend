@@ -7,3 +7,6 @@
 
 ## Test functionality
 The file `ZooH Endpoints - Test.postman_collection.json` contains a Postman-Collection with queries for every endpoint. It also has a subforder with bad queries to test the error-handling.
+
+## Important
+**If the application does not seem to be working restart the DB-Container and wait a few minutes. It may be that the data has not finished importing.**
